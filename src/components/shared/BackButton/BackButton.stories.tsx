@@ -6,7 +6,7 @@ const meta = {
   title: 'Shared/BackButton',
   component: BackButton,
   decorators: [
-    (Story) => (
+    (Story: React.ElementType) => (
       <BrowserRouter>
         <Story />
       </BrowserRouter>

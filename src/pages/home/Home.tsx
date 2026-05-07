@@ -1,53 +1,78 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { MainLayout } from '~/components/layouts';
+import { CreatePostForm } from '~/components/forms/CreatePostForm';
+import { Post } from '~/components/shared/Post';
 
-import { Button } from '~/components/shared';
+import avatarImg from '~/assets/no_avatar.png';
+import postImg from '~/assets/image.png';
 
 export const Home: React.FC = () => {
-  const navigate = useNavigate();
+  const posts = [
+    {
+      id: 1,
+      authorName: 'Annie',
+      authorHandle: '@annie',
+      timeAgo: '14s',
+      avatarUrl: avatarImg,
+      content:
+        'This is a post. It can be long, or short. Depends on what you have to say. This is a post. It can be long, or short. Depends on what you have to say.',
+      imageUrl: postImg,
+    },
+    {
+      id: 2,
+      authorName: 'Jorge Mckinney',
+      authorHandle: '@Travis Wade',
+      timeAgo: '14s',
+      avatarUrl: avatarImg,
+      content:
+        'This is a post. It can be long, or short. Depends on what you have to say. This is a post. It can be long, or short. Depends on what you have to say.This is a post. It can be long, or short. Depends on what you have to say. This is a post. It can be long, or short. Depends on what you have to say.This is a post. It can be long, or short. Depends on what you have to say. This is a post. It can be long, or short. Depends on what you have to say.This is a post. It can be long, or short. Depends on what you have to say. This is a post. It can be long, or short. Depends on what you have to say.',
+    },
+  ];
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh',
-        gap: 3,
-      }}
-    >
-      <Typography variant="h3" sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>
-        Innotter Global Feed
-      </Typography>
+    <MainLayout>
+      <Box sx={{ py: '20px', px: '30px', borderBottom: '1px solid #E5E7EB' }}>
+        <Typography
+          sx={{
+            fontFamily: 'Roboto, sans-serif',
+            fontWeight: 700,
+            fontSize: '24px',
+            color: '#000000',
+          }}
+        >
+          Home
+        </Typography>
+      </Box>
 
-      <Typography color="text.secondary" sx={{ fontFamily: 'Inter, sans-serif', fontSize: '18px' }}>
-        You are not logged in. Read public posts or join us!
-      </Typography>
-
-      <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-        <Button onClick={() => navigate('/login')}>Login</Button>
-        <Button color="secondary" onClick={() => navigate('/signup')}>
-          Create Account
-        </Button>
+      <Box sx={{ pt: '20px', pb: '10px', px: '30px' }}>
+        <CreatePostForm />
       </Box>
 
       <Box
         sx={{
-          mt: 5,
-          p: 4,
-          border: '1px dashed #ccc',
-          borderRadius: 2,
           width: '100%',
-          maxWidth: 600,
-          textAlign: 'center',
+          height: '12px',
+          backgroundColor: '#E8EEFA',
+          borderTop: '1px solid #0000000A',
+          borderBottom: '1px solid #0000000A',
         }}
-      >
-        <Typography color="text.secondary">[ Placeholder for Global Posts Feed ]</Typography>
+      />
+
+      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+        {posts.map((post) => (
+          <Box
+            key={post.id}
+            sx={{
+              py: '20px',
+              px: '30px',
+              borderBottom: '1px solid #E5E7EB',
+            }}
+          >
+            <Post {...post} />
+          </Box>
+        ))}
       </Box>
-    </Box>
+    </MainLayout>
   );
 };
-
-export default Home;

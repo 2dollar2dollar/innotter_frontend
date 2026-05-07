@@ -13,13 +13,21 @@ export default meta;
 export const Primary: Story = {
   args: {
     children: 'Primary Button',
-    color: 'primary',
+    size: 'medium',
   },
 };
 
-export const Secondary: Story = {
+export const SmallPostButton: Story = {
   args: {
-    children: 'Secondary Button',
-    color: 'secondary',
+    children: 'Post',
+    size: 'small',
+  },
+};
+
+export const SmallDisabled: Story = {
+  args: {
+    children: 'Post',
+    size: 'small',
+    disabled: true,
   },
 };

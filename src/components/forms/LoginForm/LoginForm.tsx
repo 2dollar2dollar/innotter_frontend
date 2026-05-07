@@ -36,7 +36,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
   });
 
   return (
-    <Box sx={{ width: '100%' }}>
+    // ИСПРАВЛЕНИЕ ЗДЕСЬ: Добавили maxWidth: 440 и mx: 'auto'
+    <Box sx={{ width: '100%', maxWidth: 440, mx: 'auto' }}>
       <Box sx={{ mb: 3 }}>
         <Typography
           sx={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '30px', mb: 1.5 }}
@@ -110,7 +111,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
             size="large"
             sx={{ py: 1.5, textTransform: 'none', fontSize: '16px', borderRadius: 2 }}
           >
-            Register Account
+            Login{' '}
           </Button>
 
           <Box sx={{ textAlign: 'center', mt: 1 }}>

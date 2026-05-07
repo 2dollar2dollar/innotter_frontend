@@ -14,6 +14,15 @@ const config: StorybookConfig = {
   "framework": "@storybook/react-webpack5",
   "staticDirs": [
     "../public"
-  ]
+  ],
+  webpackFinal: async (config) => {
+    if (config.resolve) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        '~': process.cwd() + '/src',
+      };
+    }
+    return config;
+  },
 };
 export default config;
