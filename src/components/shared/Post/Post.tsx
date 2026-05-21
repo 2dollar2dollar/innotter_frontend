@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 
 import { Avatar } from '~/components/shared/Avatar';
 import { RoundedImage } from '~/components/shared/RoundedImage';
@@ -8,12 +8,16 @@ import { ClickableIcon } from '~/components/shared/ClickableIcon';
 import chevronIcon from '~/assets/Chevron down.png';
 
 export interface PostProps {
+  id: string;
   authorName: string;
   authorHandle: string;
   timeAgo: string;
   avatarUrl: string;
   content?: string;
   imageUrl?: string;
+  pageId: string;
+  isFollowed?: boolean;
+  onToggleFollow?: (pageId: string, isFollowed: boolean) => void;
 }
 
 export const Post: React.FC<PostProps> = ({
@@ -23,6 +27,9 @@ export const Post: React.FC<PostProps> = ({
   avatarUrl,
   content,
   imageUrl,
+  pageId,
+  isFollowed,
+  onToggleFollow,
 }) => {
   return (
     <Box
@@ -88,6 +95,17 @@ export const Post: React.FC<PostProps> = ({
           >
             {timeAgo}
           </Typography>
+
+          {onToggleFollow && (
+            <Button
+              variant={isFollowed ? 'outlined' : 'contained'}
+              size="small"
+              onClick={() => onToggleFollow(pageId, !!isFollowed)}
+              sx={{ textTransform: 'none', borderRadius: '20px', height: '24px', ml: '12px' }}
+            >
+              {isFollowed ? 'Unfollow' : 'Follow'}
+            </Button>
+          )}
 
           <Box sx={{ marginLeft: 'auto' }}>
             <ClickableIcon

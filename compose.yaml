@@ -11,7 +11,7 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true
     networks:
-      - innotter-network
+      - default
 
   storybook:
     build:
@@ -24,8 +24,9 @@ services:
       - .:/app
       - /app/node_modules
     networks:
-      - innotter-network
+      - default
 
 networks:
-  innotter-network:
-    driver: bridge
+  default:
+    external: true
+    name: microservices_net

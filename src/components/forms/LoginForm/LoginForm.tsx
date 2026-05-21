@@ -5,16 +5,7 @@ import * as yup from 'yup';
 
 import { Button } from '../../shared/Button';
 import { FormField } from '../../shared/FormField';
-
-export interface LoginFormValues {
-  email: string;
-  password?: string;
-  rememberMe: boolean;
-}
-
-export interface LoginFormProps {
-  onSubmit: (values: LoginFormValues) => void;
-}
+import { LoginFormValues, LoginFormProps } from './types';
 
 const validationSchema = yup.object({
   email: yup.string().email('Invalid email format').required('Email is required'),
@@ -25,18 +16,16 @@ const validationSchema = yup.object({
   rememberMe: yup.boolean(),
 });
 
-export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
+export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, isLoading, serverError }) => {
   const formik = useFormik<LoginFormValues>({
     initialValues: { email: '', password: '', rememberMe: false },
     validationSchema: validationSchema,
     onSubmit: (values) => {
       onSubmit(values);
-      formik.resetForm();
     },
   });
 
   return (
-    // ИСПРАВЛЕНИЕ ЗДЕСЬ: Добавили maxWidth: 440 и mx: 'auto'
     <Box sx={{ width: '100%', maxWidth: 440, mx: 'auto' }}>
       <Box sx={{ mb: 3 }}>
         <Typography
@@ -104,14 +93,22 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
             sx={{ mt: -1 }}
           />
 
+          {/* Ошибка сервера над кнопкой */}
+          {serverError && (
+            <Typography color="error" variant="body2" sx={{ textAlign: 'center', mt: -1 }}>
+              {serverError}
+            </Typography>
+          )}
+
           <Button
             color="primary"
             type="submit"
             fullWidth
             size="large"
+            disabled={isLoading}
             sx={{ py: 1.5, textTransform: 'none', fontSize: '16px', borderRadius: 2 }}
           >
-            Login{' '}
+            {isLoading ? 'Logging in...' : 'Login'}
           </Button>
 
           <Box sx={{ textAlign: 'center', mt: 1 }}>

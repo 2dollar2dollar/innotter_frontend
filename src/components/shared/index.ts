@@ -3,7 +3,6 @@ export * from './FormField';
 export * from './Logo/Logo';
 export * from './BackButton/BackButton';
 export * from './NavItem';
-export * from '../layouts/Sidebar';
 export * from './Avatar';
 export * from './ProfileText/ProfileText';
 export * from './LineDivider/LineDivider';

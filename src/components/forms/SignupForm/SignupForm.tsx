@@ -7,18 +7,30 @@ import { Button } from '../../shared/Button';
 import { FormField } from '../../shared/FormField';
 
 export interface SignupFormValues {
-  fullName: string;
+  name: string;
+  surname: string;
   email: string;
   phone: string;
   username: string;
+  password: string;
 }
 
-export interface SignupFormProps {
+interface SignupFormProps {
   onSubmit: (values: SignupFormValues) => void;
+  isLoading?: boolean;
 }
 
 const validationSchema = yup.object({
-  fullName: yup.string().required('Full Name is required'),
+  name: yup
+    .string()
+    .min(2, 'Min 2 characters')
+    .matches(/^[A-Za-z]+$/, 'Only letters')
+    .required('Name is required'),
+  surname: yup
+    .string()
+    .min(2, 'Min 2 characters')
+    .matches(/^[A-Za-z]+$/, 'Only letters')
+    .required('Surname is required'),
   email: yup.string().email('Invalid email format').required('Email is required'),
   phone: yup
     .string()
@@ -28,15 +40,21 @@ const validationSchema = yup.object({
     .string()
     .min(3, 'Username must be at least 3 characters')
     .required('Username is required'),
+  password: yup
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .matches(/[A-Z]/, 'Must contain at least one uppercase letter')
+    .matches(/[a-z]/, 'Must contain at least one lowercase letter')
+    .matches(/\d/, 'Must contain at least one number')
+    .required('Password is required'),
 });
 
-export const SignupForm: React.FC<SignupFormProps> = ({ onSubmit }) => {
+export const SignupForm: React.FC<SignupFormProps> = ({ onSubmit, isLoading }) => {
   const formik = useFormik<SignupFormValues>({
-    initialValues: { fullName: '', email: '', phone: '', username: '' },
+    initialValues: { name: '', surname: '', email: '', phone: '', username: '', password: '' },
     validationSchema: validationSchema,
     onSubmit: (values) => {
       onSubmit(values);
-      formik.resetForm();
     },
   });
 
@@ -50,13 +68,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSubmit }) => {
         </Typography>
         <Typography
           color="text.secondary"
-          sx={{
-            fontFamily: 'Inter, sans-serif',
-            fontWeight: 400,
-            fontSize: '18px',
-            lineHeight: '28px',
-            mb: 3,
-          }}
+          sx={{ fontFamily: 'Inter, sans-serif', fontSize: '18px', mb: 3 }}
         >
           Become a member and enjoy exclusive promotions.
         </Typography>
@@ -65,17 +77,30 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSubmit }) => {
 
       <form onSubmit={formik.handleSubmit}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          <FormField
-            label="Full Name"
-            placeholder="Enter your full name"
-            id="fullName"
-            name="fullName"
-            value={formik.values.fullName}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={formik.touched.fullName && Boolean(formik.errors.fullName)}
-            helperText={(formik.touched.fullName && formik.errors.fullName) || ' '}
-          />
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <FormField
+              label="Name"
+              placeholder="Name"
+              id="name"
+              name="name"
+              value={formik.values.name}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.name && Boolean(formik.errors.name)}
+              helperText={(formik.touched.name && formik.errors.name) || ' '}
+            />
+            <FormField
+              label="Surname"
+              placeholder="Surname"
+              id="surname"
+              name="surname"
+              value={formik.values.surname}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.surname && Boolean(formik.errors.surname)}
+              helperText={(formik.touched.surname && formik.errors.surname) || ' '}
+            />
+          </Box>
 
           <FormField
             label="Email Address"
@@ -113,22 +138,21 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSubmit }) => {
             helperText={(formik.touched.username && formik.errors.username) || ' '}
           />
 
-          <Button
-            color="primary"
-            type="submit"
-            fullWidth
-            size="large"
-            sx={{
-              fontFamily: 'Inter, sans-serif',
-              fontWeight: 500,
-              fontSize: '16px',
-              py: 1.5,
-              textTransform: 'none',
-              borderRadius: 2,
-              mt: 1,
-            }}
-          >
-            Continue
+          <FormField
+            label="Password"
+            placeholder="Create a password"
+            id="password"
+            name="password"
+            type="password"
+            value={formik.values.password}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.password && Boolean(formik.errors.password)}
+            helperText={(formik.touched.password && formik.errors.password) || ' '}
+          />
+
+          <Button color="primary" type="submit" fullWidth size="large" disabled={isLoading}>
+            {isLoading ? 'Creating account...' : 'Continue'}
           </Button>
         </Box>
       </form>

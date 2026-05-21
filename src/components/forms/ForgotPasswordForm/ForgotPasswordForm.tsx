@@ -5,22 +5,22 @@ import * as yup from 'yup';
 
 import { Button } from '../../shared/Button';
 import { FormField } from '../../shared/FormField';
-
-export interface ForgotPasswordFormProps {
-  onSubmit: (values: { email: string }) => void;
-}
+import { ForgotPasswordFormValues, ForgotPasswordFormProps } from './types';
 
 const validationSchema = yup.object({
   email: yup.string().email('Invalid email format').required('Email is required'),
 });
 
-export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onSubmit }) => {
-  const formik = useFormik({
+export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
+  onSubmit,
+  isLoading,
+  serverError,
+}) => {
+  const formik = useFormik<ForgotPasswordFormValues>({
     initialValues: { email: '' },
     validationSchema: validationSchema,
     onSubmit: (values) => {
       onSubmit(values);
-      formik.resetForm();
     },
   });
 
@@ -57,11 +57,18 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onSubmit
             helperText={(formik.touched.email && formik.errors.email) || ' '}
           />
 
+          {serverError && (
+            <Typography color="error" variant="body2" sx={{ textAlign: 'center', mt: -1 }}>
+              {serverError}
+            </Typography>
+          )}
+
           <Button
             color="primary"
             type="submit"
             fullWidth
             size="large"
+            disabled={isLoading}
             sx={{
               fontFamily: 'Inter, sans-serif',
               fontWeight: 500,
@@ -72,7 +79,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onSubmit
               mt: 1,
             }}
           >
-            Submit
+            {isLoading ? 'Sending...' : 'Submit'}
           </Button>
         </Box>
       </form>
