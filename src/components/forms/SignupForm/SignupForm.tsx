@@ -18,6 +18,7 @@ export interface SignupFormValues {
 interface SignupFormProps {
   onSubmit: (values: SignupFormValues) => void;
   isLoading?: boolean;
+  serverError?: string | null;
 }
 
 const validationSchema = yup.object({
@@ -49,7 +50,7 @@ const validationSchema = yup.object({
     .required('Password is required'),
 });
 
-export const SignupForm: React.FC<SignupFormProps> = ({ onSubmit, isLoading }) => {
+export const SignupForm: React.FC<SignupFormProps> = ({ onSubmit, isLoading, serverError }) => {
   const formik = useFormik<SignupFormValues>({
     initialValues: { name: '', surname: '', email: '', phone: '', username: '', password: '' },
     validationSchema: validationSchema,
@@ -150,6 +151,12 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSubmit, isLoading }) =
             error={formik.touched.password && Boolean(formik.errors.password)}
             helperText={(formik.touched.password && formik.errors.password) || ' '}
           />
+
+          {serverError && (
+            <Typography color="error" variant="body2" sx={{ textAlign: 'center', mt: -1 }}>
+              {serverError}
+            </Typography>
+          )}
 
           <Button color="primary" type="submit" fullWidth size="large" disabled={isLoading}>
             {isLoading ? 'Creating account...' : 'Continue'}

@@ -1,155 +1,145 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Box, Typography, Button, CircularProgress } from '@mui/material';
+import { Box, Typography, Chip, Button, CircularProgress, TextField } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { MainLayout } from '~/components/layouts';
 import { Avatar } from '~/components/shared/Avatar';
 import { AppState } from '~/store/reducers';
-import { fetchProfileAction } from '~/store/actions/profile.action';
 import {
+  fetchTagsAction,
+  fetchAllPagesAction,
   fetchSubscriptionsAction,
   toggleFollowAction,
-  fetchAllPagesAction, // <-- ИСПРАВЛЕНИЕ: Добавили недостающий импорт экшена
-  TagData,
+  createTagAction,
 } from '~/store/actions/posts.action';
-import * as PostsService from '~/core/services/posts/posts.service';
-
 import avatarImg from '~/assets/no_avatar.png';
 
-export const ProfilePage: React.FC = () => {
-  const { userId } = useParams<{ userId: string }>();
+export const Explore: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [foreignUser, setForeignUser] = useState<any>(null);
-  const [userPages, setUserPages] = useState<any[]>([]);
-  const [isLoadingPages, setIsLoadingPages] = useState(true);
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [newTagName, setNewTagName] = useState('');
 
-  // Данные текущего залогиненного пользователя из Redux
-  const { data: currentUserData, isLoading: isProfileLoading } = useSelector(
-    (state: AppState) => state.profile
+  const { tags, allPages, subscribedPageIds, isLoading } = useSelector(
+    (state: AppState) => state.posts
   );
-  const { subscribedPageIds } = useSelector((state: AppState) => state.posts);
 
-  // Достаем наш ID из токена, чтобы понять, смотрим ли мы свой профиль
-  const currentUserId = useMemo(() => {
+  const currentUserRole = useMemo(() => {
     const token = localStorage.getItem('accessToken');
-    if (!token) return null;
+    if (!token) return 'USER';
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.id || payload.user_id || payload.sub;
+      const rawRole = payload.role || payload.role_name || 'USER';
+      return String(rawRole).toUpperCase(); // ФОРСИРУЕМ ВЕРХНИЙ РЕГИСТР
     } catch {
-      return null;
+      return 'USER';
     }
   }, []);
 
-  const isMyProfile = !userId || userId === currentUserId;
-  const targetUserId = userId || currentUserId;
+  const canCreateTag = currentUserRole === 'ADMIN' || currentUserRole === 'MODERATOR';
 
-  // 1. Загружаем данные пользователя
   useEffect(() => {
-    if (isMyProfile && !currentUserData) {
-      dispatch(fetchProfileAction.request());
-    } else if (!isMyProfile && userId) {
-      // Если смотрим чужой профиль — тянем данные из UMS
-      PostsService.getUserById(userId).then(setForeignUser).catch(console.error);
-    }
-  }, [dispatch, isMyProfile, currentUserData, userId]);
-
-  // 2. Загружаем подписки (чтобы правильно отображать кнопки Follow/Unfollow)
-  useEffect(() => {
+    dispatch(fetchTagsAction.request());
+    dispatch(fetchAllPagesAction.request());
     dispatch(fetchSubscriptionsAction.request());
   }, [dispatch]);
 
-  // 3. Загружаем список страниц этого пользователя
-  useEffect(() => {
-    if (targetUserId) {
-      setIsLoadingPages(true);
-      PostsService.getUserPages(targetUserId)
-        .then((res: any) => {
-          const pages = Array.isArray(res) ? res : res.results || [];
-          setUserPages(pages);
-        })
-        .catch(console.error)
-        .finally(() => setIsLoadingPages(false));
-    }
-  }, [targetUserId]);
-
-  const handleToggleFollow = (pageId: string, isCurrentlyFollowed: boolean) => {
+  const handleToggleFollow = (pageId: string, isCurrentlyFollowed: boolean) =>
     dispatch(toggleFollowAction.request({ pageId, isCurrentlyFollowed }));
+  const handleTagClick = (tagName: string) => {
+    if (selectedTag === tagName) {
+      setSelectedTag(null);
+      dispatch(fetchAllPagesAction.request());
+    } else {
+      setSelectedTag(tagName);
+      dispatch(fetchAllPagesAction.request({ tags: tagName }));
+    }
   };
-
-  // Определяем, чьи данные выводить на экран
-  const displayUser = isMyProfile ? currentUserData : foreignUser;
-  const isLoading = isProfileLoading || isLoadingPages || (!displayUser && isMyProfile);
-
-  const avatar = displayUser?.profile_image_url || avatarImg;
-  const displayName = displayUser
-    ? `${displayUser.name} ${displayUser.surname || ''}`.trim()
-    : '...';
-  const handle = displayUser?.username
-    ? `@${displayUser.username}`
-    : `@user_${targetUserId?.substring(0, 6)}`;
+  const handleCreateTag = () => {
+    if (newTagName.trim()) {
+      dispatch(createTagAction.request(newTagName.trim()));
+      setNewTagName('');
+    }
+  };
 
   return (
     <MainLayout>
-      <Box sx={{ borderBottom: '1px solid #E5E7EB', pb: 4 }}>
-        {/* Шапка профиля */}
-        <Box sx={{ width: '100%', height: '150px', backgroundColor: '#E8EEFA' }} />
-
-        <Box sx={{ px: '30px', position: 'relative' }}>
-          <Box
-            sx={{
-              position: 'absolute',
-              top: '-60px',
-              border: '4px solid white',
-              borderRadius: '50%',
-              backgroundColor: 'white',
-              display: 'flex',
-            }}
-          >
-            <Avatar src={String(avatar)} size="large" />
-          </Box>
-
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 2, minHeight: '60px' }}>
-            {/* КНОПКА РЕДАКТИРОВАНИЯ (Только если это мой профиль) */}
-            {isMyProfile && (
-              <Button
-                variant="outlined"
-                onClick={() => navigate('/profile/edit')}
-                sx={{ borderRadius: '20px', textTransform: 'none', fontWeight: 600 }}
-              >
-                Edit Profile
-              </Button>
-            )}
-          </Box>
-
-          <Box sx={{ mt: 1 }}>
-            <Typography sx={{ fontWeight: 800, fontSize: '24px' }}>{displayName}</Typography>
-            <Typography sx={{ color: '#828282', mb: 2 }}>{handle}</Typography>
-          </Box>
-        </Box>
+      <Box sx={{ py: '15px', px: '30px', borderBottom: '1px solid #E5E7EB' }}>
+        <Typography sx={{ fontSize: '24px', fontWeight: 700 }}>Explore</Typography>
       </Box>
 
-      {/* СПИСОК СТРАНИЦ ПОЛЬЗОВАТЕЛЯ */}
+      {/* ТРЕНДОВЫЕ ТЕГИ */}
+      <Box sx={{ p: '20px 30px', borderBottom: '1px solid #E5E7EB' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Typography sx={{ fontSize: '20px', fontWeight: 800 }}>Trending Tags</Typography>
+        </Box>
+
+        {canCreateTag && (
+          <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+            <TextField
+              size="small"
+              placeholder="New tag name"
+              value={newTagName}
+              onChange={(e) => setNewTagName(e.target.value)}
+            />
+            <Button
+              variant="contained"
+              onClick={handleCreateTag}
+              disabled={!newTagName.trim()}
+              sx={{ textTransform: 'none', borderRadius: '20px', fontWeight: 600 }}
+            >
+              Create Tag
+            </Button>
+          </Box>
+        )}
+
+        {tags.length === 0 ? (
+          <Typography sx={{ color: '#828282' }}>No tags available yet.</Typography>
+        ) : (
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            {tags.map((tag) => (
+              <Chip
+                key={tag.id}
+                label={`#${tag.name}`}
+                clickable
+                onClick={() => handleTagClick(tag.name)}
+                sx={{
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  bgcolor: selectedTag === tag.name ? '#1D9BF0' : '#F3F4F6',
+                  color: selectedTag === tag.name ? 'white' : 'inherit',
+                  '&:hover': { bgcolor: selectedTag === tag.name ? '#1A8CD8' : '#E5E7EB' },
+                }}
+              />
+            ))}
+          </Box>
+        )}
+      </Box>
+
+      {/* КАТАЛОГ СТРАНИЦ */}
       <Box sx={{ p: '20px 30px' }}>
         <Typography sx={{ fontSize: '20px', fontWeight: 800, mb: 4 }}>
-          {isMyProfile ? 'My Pages' : 'Pages'}
+          {selectedTag ? `Pages with #${selectedTag}` : 'Who to follow'}
         </Typography>
 
         {isLoading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
             <CircularProgress />
           </Box>
-        ) : userPages.length === 0 ? (
+        ) : allPages.length === 0 ? (
           <Typography sx={{ color: '#828282', textAlign: 'center', mt: 4 }}>
-            No pages found.
+            No pages found with this tag.
           </Typography>
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {userPages.map((page: any) => {
+            {allPages.map((page: any) => {
               const isFollowed = subscribedPageIds.includes(page.id);
+              const userAvatar = page.user?.profile_image_url || avatarImg;
+              const handle = page.user?.username
+                ? `@${page.user.username}`
+                : `@user_${page.user_id?.substring(0, 6)}`;
               const postsCount = page.posts_count || 0;
 
               return (
@@ -173,7 +163,6 @@ export const ProfilePage: React.FC = () => {
                       backgroundPosition: 'center',
                     }}
                   />
-
                   <Box sx={{ px: '30px', pb: '20px', position: 'relative' }}>
                     <Box
                       sx={{
@@ -185,9 +174,8 @@ export const ProfilePage: React.FC = () => {
                         display: 'flex',
                       }}
                     >
-                      <Avatar src={String(avatar)} size="large" />
+                      <Avatar src={String(userAvatar)} size="large" />
                     </Box>
-
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 1.5, pb: 1 }}>
                       <Button
                         variant={isFollowed ? 'outlined' : 'contained'}
@@ -203,7 +191,6 @@ export const ProfilePage: React.FC = () => {
                         {isFollowed ? 'Unfollow' : 'Follow'}
                       </Button>
                     </Box>
-
                     <Box
                       sx={{ mt: 1, pr: '60px', cursor: 'pointer' }}
                       onClick={() => navigate(`/page/${page.id}`)}
@@ -220,16 +207,14 @@ export const ProfilePage: React.FC = () => {
                       <Typography sx={{ color: '#828282', fontSize: '15px', mb: 1 }}>
                         {handle}
                       </Typography>
-
                       {page.tags && page.tags.length > 0 && (
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mb: 1.5 }}>
-                          {page.tags.map((t: TagData) => (
+                          {page.tags.map((t: any) => (
                             <Typography
                               key={t.id}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                navigate('/explore');
-                                dispatch(fetchAllPagesAction.request({ tags: t.name }));
+                                handleTagClick(t.name);
                               }}
                               sx={{
                                 color: '#1D9BF0',
@@ -244,7 +229,6 @@ export const ProfilePage: React.FC = () => {
                           ))}
                         </Box>
                       )}
-
                       {page.description && (
                         <Typography
                           sx={{
@@ -260,7 +244,6 @@ export const ProfilePage: React.FC = () => {
                         </Typography>
                       )}
                     </Box>
-
                     <Box
                       onClick={() => navigate(`/page/${page.id}`)}
                       sx={{

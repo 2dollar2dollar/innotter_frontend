@@ -68,9 +68,9 @@ export const Sidebar: React.FC = () => {
             textTransform: 'none',
             boxShadow: '0px 4px 12px rgba(44, 115, 235, 0.2)',
           }}
-          onClick={() => console.log('Open Create Post Modal')}
+          onClick={() => navigate('/create-page')}
         >
-          Post
+          Create Page
         </Button>
       </Box>
     </Box>
