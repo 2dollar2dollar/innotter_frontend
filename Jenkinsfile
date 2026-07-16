@@ -46,7 +46,6 @@ pipeline {
                 sh 'docker exec minikube bash -c "if ! command -v kubectl &> /dev/null; then curl -sLO https://dl.k8s.io/release/v1.35.1/bin/linux/arm64/kubectl && chmod +x kubectl && mv kubectl /usr/local/bin/; fi"'
 
                 echo 'Applying Kubernetes manifests...'
-                # ЧИНИМ ПУТИ К НАШИМ НОВЫМ ФАЙЛАМ ТУТ:
                 sh 'cat 01-deployment.yaml | docker exec -i minikube kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f -'
                 sh 'cat 02-service.yaml | docker exec -i minikube kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f -'
             }
