@@ -34,7 +34,7 @@ pipeline {
                 sh '''
                 docker build \
                   --build-arg AUTH_API_URL="/api/v1/auth" \
-                  --build-arg POSTS_API_URL="/api/v1/posts" \
+                  --build-arg POSTS_API_URL="/api/v1" \
                   -t ${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile .
                 '''
             }
