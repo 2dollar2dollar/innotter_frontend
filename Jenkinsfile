@@ -30,15 +30,11 @@ pipeline {
 
         stage('Build Production Container') {
             steps {
-                echo 'Force-replacing localhost with relative paths in source code...'
-                sh "find src -type f -exec sed -i 's|http://localhost:8000/api/v1|/api/v1/auth|g' {} +"
-                sh "find src -type f -exec sed -i 's|http://localhost:8002/api/v1|/api/v1|g' {} +"
-                
                 echo 'Building final Nginx production image...'
                 sh '''
                 docker build \
                   --build-arg AUTH_API_URL="/api/v1/auth" \
-                  --build-arg POSTS_API_URL="/api/v1" \
+                  --build-arg POSTS_API_URL="/api/v1/posts" \
                   -t ${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile .
                 '''
             }
