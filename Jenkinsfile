@@ -24,7 +24,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 echo 'Running unit tests...'
-                // ИСПРАВЛЕНО: добавлено -e CI=true, чтобы тесты не зависали в watch-mode!
+                // Передаем CI=true, чтобы тесты React не зависали
                 sh 'docker run --rm -e CI=true ${IMAGE_NAME}:dev npm test -- --passWithNoTests || echo "Tests are not strictly configured yet"'
             }
         }
@@ -52,10 +52,8 @@ pipeline {
     
     post {
         always {
-            node {
-                echo 'Cleaning up workspace...'
-                sh 'rm -f image.tar || true'
-            }
+            echo 'Cleaning up workspace...'
+            sh 'rm -f image.tar || true'
         }
     }
 }
