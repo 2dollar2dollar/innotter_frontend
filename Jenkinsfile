@@ -10,28 +10,28 @@ pipeline {
         stage('Build Dev Image for Tests') {
             steps {
                 echo 'Building development stage to run tests and linters...'
-                sh 'docker build --target development -t ${IMAGE_NAME}:dev -f Dockerfile .'
+                sh 'docker build --target development -t ${IMAGE_NAME}:dev -f Dockerfile .' [cite: 2]
             }
         }
 
         stage('Linters & Formatters') {
             steps {
                 echo 'Running ESLint/Prettier...'
-                sh 'docker run --rm ${IMAGE_NAME}:dev npm run lint || echo "Linter is not strictly configured yet"'
+                sh 'docker run --rm ${IMAGE_NAME}:dev npm run lint || echo "Linter is not strictly configured yet"' [cite: 4]
             }
         }
 
         stage('Run Tests') {
             steps {
                 echo 'Running unit tests...'
-                sh 'docker run --rm -e CI=true ${IMAGE_NAME}:dev npm test -- --passWithNoTests || echo "Tests are not strictly configured yet"'
+                sh 'docker run --rm -e CI=true ${IMAGE_NAME}:dev npm test -- --passWithNoTests || echo "Tests are not strictly configured yet"' [cite: 5]
             }
         }
 
         stage('Build Production Container') {
             steps {
                 echo 'Building final Nginx production image...'
-                sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile .'
+                sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile .' [cite: 6]
             }
         }
 
@@ -40,14 +40,15 @@ pipeline {
                 echo 'Transferring image to Minikube cluster...'
                 sh 'docker save ${IMAGE_NAME}:${IMAGE_TAG} -o image.tar'
                 sh 'docker cp image.tar minikube:/image.tar'
-                sh 'docker exec minikube docker load -i /image.tar'
+                sh 'docker exec minikube docker load -i /image.tar' [cite: 7]
 
                 echo 'Ensuring kubectl is installed in minikube container...'
                 sh 'docker exec minikube bash -c "if ! command -v kubectl &> /dev/null; then curl -sLO https://dl.k8s.io/release/v1.35.1/bin/linux/arm64/kubectl && chmod +x kubectl && mv kubectl /usr/local/bin/; fi"'
 
                 echo 'Applying Kubernetes manifests...'
-                sh 'cat k8s/deployment.yaml | docker exec -i minikube kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f -'
-                sh 'cat k8s/service.yaml | docker exec -i minikube kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f -'
+                # ЧИНИМ ПУТИ К НАШИМ НОВЫМ ФАЙЛАМ ТУТ:
+                sh 'cat 01-deployment.yaml | docker exec -i minikube kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f -'
+                sh 'cat 02-service.yaml | docker exec -i minikube kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f -'
             }
         }
     }
@@ -55,7 +56,7 @@ pipeline {
     post {
         always {
             echo 'Cleaning up workspace...'
-            sh 'rm -f image.tar || true'
+            sh 'rm -f image.tar || true' [cite: 11]
         }
     }
 }
