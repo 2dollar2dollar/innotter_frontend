@@ -31,7 +31,12 @@ pipeline {
         stage('Build Production Container') {
             steps {
                 echo 'Building final Nginx production image...'
-                sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile .'
+                sh '''
+                docker build \
+                  --build-arg AUTH_API_URL="/api/v1/auth" \
+                  --build-arg POSTS_API_URL="/api/v1/posts" \
+                  -t ${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile .
+                '''
             }
         }
 
