@@ -48,7 +48,10 @@
       "react-app",
       "react-app/jest",
       "plugin:storybook/recommended"
-    ]
+    ],
+    "rules": {
+    "@typescript-eslint/no-explicit-any": "off"
+  }
   },
   "browserslist": {
     "production": [
