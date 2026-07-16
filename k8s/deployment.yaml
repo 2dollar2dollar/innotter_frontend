@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  labels:
+    app: innotter-frontend
+spec:
+  replicas: 1 # Сколько копий приложения поднять
+  selector:
+    matchLabels:
+      app: innotter-frontend
+  template:
+    metadata:
+      labels:
+        app: innotter-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: innotter-frontend:latest
+          imagePullPolicy: Never # ВАЖНО: говорим K8s искать образ локально, а не качать из интернета
+          ports:
+            - containerPort: 80 # Порт, на котором работает Nginx из твоего Dockerfile
