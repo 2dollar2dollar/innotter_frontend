@@ -9,6 +9,7 @@ COPY . .
 CMD ["npm", "start"]
 
 FROM development AS builder
+
 ARG AUTH_API_URL
 ARG POSTS_API_URL
 
@@ -16,6 +17,11 @@ ENV REACT_APP_AUTH_API_URL=$AUTH_API_URL
 ENV REACT_APP_POSTS_API_URL=$POSTS_API_URL
 ENV AUTH_API_URL=$AUTH_API_URL
 ENV POSTS_API_URL=$POSTS_API_URL
+
+RUN echo "AUTH_API_URL=$AUTH_API_URL" > .env && \
+    echo "POSTS_API_URL=$POSTS_API_URL" >> .env && \
+    echo "REACT_APP_AUTH_API_URL=$AUTH_API_URL" >> .env && \
+    echo "REACT_APP_POSTS_API_URL=$POSTS_API_URL" >> .env
 
 RUN npm run build
 
