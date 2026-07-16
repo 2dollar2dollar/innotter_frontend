@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 
-const AUTH_API_URL = process.env.AUTH_API_URL || 'http://localhost:8000/api/v1';
-const POSTS_API_URL = process.env.POSTS_API_URL || 'http://localhost:8002/api/v1';
+const AUTH_API_URL = process.env.AUTH_API_URL;
+const POSTS_API_URL = process.env.POSTS_API_URL;
 
 const attachInterceptors = (client: AxiosInstance) => {
   client.interceptors.request.use(
