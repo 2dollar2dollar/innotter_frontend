@@ -61,7 +61,7 @@ pipeline {
     post {
         always {
             echo 'Cleaning up workspace...'
-            sh 'rm -f image.tar'
+            sh 'rm -f image.tar || true'
         }
     }
 }
