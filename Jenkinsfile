@@ -11,7 +11,7 @@ pipeline {
             steps {
                 echo 'Building development stage to run tests and linters...'
                 // Собираем образ до этапа "development" (как у тебя в Dockerfile)
-                sh 'docker build --target development -t ${IMAGE_NAME}:dev -f frontend-Dockerfile .'
+                sh 'docker build --target development -t ${IMAGE_NAME}:dev -f Dockerfile .'
             }
         }
 
@@ -36,7 +36,7 @@ pipeline {
             steps {
                 echo 'Building final Nginx production image...'
                 // Теперь собираем финальный легковесный прод-образ
-                sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f frontend-Dockerfile .'
+                sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile .'
             }
         }
 
