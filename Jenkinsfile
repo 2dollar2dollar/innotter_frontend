@@ -24,7 +24,6 @@ pipeline {
         stage('Run Tests') {
             steps {
                 echo 'Running unit tests...'
-                // Передаем CI=true, чтобы тесты React не зависали
                 sh 'docker run --rm -e CI=true ${IMAGE_NAME}:dev npm test -- --passWithNoTests || echo "Tests are not strictly configured yet"'
             }
         }
@@ -43,9 +42,12 @@ pipeline {
                 sh 'docker cp image.tar minikube:/image.tar'
                 sh 'docker exec minikube docker load -i /image.tar'
 
+                echo 'Ensuring kubectl is installed in minikube container...'
+                sh 'docker exec minikube bash -c "if ! command -v kubectl &> /dev/null; then curl -sLO https://dl.k8s.io/release/v1.35.1/bin/linux/arm64/kubectl && chmod +x kubectl && mv kubectl /usr/local/bin/; fi"'
+
                 echo 'Applying Kubernetes manifests...'
-                sh 'cat k8s/deployment.yaml | docker exec -i minikube kubectl apply -f -'
-                sh 'cat k8s/service.yaml | docker exec -i minikube kubectl apply -f -'
+                sh 'cat k8s/deployment.yaml | docker exec -i minikube kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f -'
+                sh 'cat k8s/service.yaml | docker exec -i minikube kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f -'
             }
         }
     }
