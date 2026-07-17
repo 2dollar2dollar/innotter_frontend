@@ -53,6 +53,9 @@ pipeline {
                 echo 'Applying Kubernetes manifests...'
                 sh 'cat k8s/01-deployment.yaml | docker exec -i minikube kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f -'
                 sh 'cat k8s/02-service.yaml | docker exec -i minikube kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f -'
+
+                echo 'Forcing pods to restart with the newly loaded image...'
+                sh 'docker exec -i minikube kubectl --kubeconfig /etc/kubernetes/admin.conf rollout restart deployment/frontend-deployment'
             }
         }
     }
