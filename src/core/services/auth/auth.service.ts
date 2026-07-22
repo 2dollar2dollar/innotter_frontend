@@ -7,7 +7,7 @@ export const createAccount = async (data: SignupFormValues) => {
     ...data,
     group_name: 'default',
   };
-  const response = await authClient.post('/auth/signup', payload);
+  const response = await authClient.post('/signup', payload);
   return response.data;
 };
 
@@ -16,7 +16,7 @@ export const login = async (data: LoginFormValues) => {
   formData.append('username', data.email || '');
   formData.append('password', data.password || '');
 
-  const response = await authClient.post('/auth/login', formData, {
+  const response = await authClient.post('/login', formData, {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
@@ -25,6 +25,6 @@ export const login = async (data: LoginFormValues) => {
 };
 
 export const forgotPassword = async (email: string) => {
-  const response = await authClient.post('/auth/reset-password', { email });
+  const response = await authClient.post('/reset-password', { email });
   return response.data; // Returns { detail: "If the account exists..." }
 };

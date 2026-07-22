@@ -46,7 +46,7 @@ export const unfollowPage = async (pageId: string) => {
 };
 
 export const getUserById = async (userId: string) => {
-  const response = await authClient.get(`/${userId}`);
+  const response = await usersClient.get(`/${userId}`);
   return response.data;
 };
 
