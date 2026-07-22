@@ -34,7 +34,8 @@ pipeline {
                 sh '''
                 docker build \
                   --build-arg AUTH_API_URL="/api/v1/auth" \
-                  --build-arg POSTS_API_URL="/api/v1" \
+                  --build-arg POSTS_API_URL="/api/v1/posts" \
+                  --build-arg USERS_API_URL="/api/v1/users" \
                   -t ${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile .
                 '''
             }
@@ -53,6 +54,7 @@ pipeline {
                 echo 'Applying Kubernetes manifests...'
                 sh 'cat k8s/01-deployment.yaml | docker exec -i minikube kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f -'
                 sh 'cat k8s/02-service.yaml | docker exec -i minikube kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f -'
+                sh 'cat k8s/03-ingress.yaml | docker exec -i minikube kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f -'
 
                 echo 'Forcing pods to restart with the newly loaded image...'
                 sh 'docker exec -i minikube kubectl --kubeconfig /etc/kubernetes/admin.conf rollout restart deployment/frontend-deployment'

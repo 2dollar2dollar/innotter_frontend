@@ -1,7 +1,8 @@
 import axios, { AxiosInstance } from 'axios';
 
-const AUTH_API_URL = process.env.AUTH_API_URL || '/api/v1';
+const AUTH_API_URL = process.env.AUTH_API_URL || '/api/v1/auth';
 const POSTS_API_URL = process.env.POSTS_API_URL || '/api/v1/posts';
+const USERS_API_URL = process.env.USERS_API_URL || '/api/v1/users';
 
 const attachInterceptors = (client: AxiosInstance) => {
   client.interceptors.request.use(
@@ -35,7 +36,7 @@ const attachInterceptors = (client: AxiosInstance) => {
 
           if (!refreshToken) throw new Error('No refresh token');
 
-          const response = await axios.post(`${AUTH_API_URL}/auth/refresh-token`, {
+          const response = await axios.post(`${AUTH_API_URL}/refresh-token`, {
             refresh_token: refreshToken,
           });
 
@@ -69,3 +70,4 @@ const attachInterceptors = (client: AxiosInstance) => {
 
 export const authClient = attachInterceptors(axios.create({ baseURL: AUTH_API_URL }));
 export const postsClient = attachInterceptors(axios.create({ baseURL: POSTS_API_URL }));
+export const usersClient = attachInterceptors(axios.create({ baseURL: USERS_API_URL }));
