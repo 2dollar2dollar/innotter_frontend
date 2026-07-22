@@ -2,6 +2,8 @@ import { takeLatest, call, put, Effect } from 'redux-saga/effects';
 import { ActionType } from 'typesafe-actions';
 import axios from 'axios';
 
+import { usersClient } from '~/api/client';
+
 import {
   fetchProfileAction,
   updateProfileAction,
@@ -9,14 +11,6 @@ import {
   uploadAvatarAction,
 } from '../actions/profile.action';
 import { AuthSuccessPayload } from '../actions/auth.action';
-
-const API_URL =
-  (import.meta as unknown as { env: { AUTH_API_URL?: string } }).env.AUTH_API_URL ||
-  'http://localhost:8000/api/v1';
-
-const getAuthHeaders = () => ({
-  Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-});
 
 const extractError = (error: unknown): string => {
   if (axios.isAxiosError(error)) {
@@ -32,7 +26,7 @@ const extractError = (error: unknown): string => {
 export class ProfileSagaWorker {
   static *fetchProfile(): Generator<Effect, void, any> {
     try {
-      const response = yield call(axios.get, `${API_URL}/users/me`, { headers: getAuthHeaders() });
+      const response = yield call(usersClient.get, '/me');
       yield put(fetchProfileAction.success(response.data as AuthSuccessPayload));
     } catch (error: unknown) {
       yield put(fetchProfileAction.failure(extractError(error)));
@@ -43,10 +37,7 @@ export class ProfileSagaWorker {
     payload,
   }: ActionType<typeof updateProfileAction.request>): Generator<Effect, void, any> {
     try {
-      // Отправляем патч на множественное число: users/me
-      const response = yield call(axios.patch, `${API_URL}/users/me`, payload, {
-        headers: getAuthHeaders(),
-      });
+      const response = yield call(usersClient.patch, '/me', payload);
       yield put(updateProfileAction.success(response.data as AuthSuccessPayload));
     } catch (error: unknown) {
       yield put(updateProfileAction.failure(extractError(error)));
@@ -58,8 +49,7 @@ function* deleteProfileWorker({
   payload,
 }: ReturnType<typeof deleteProfileAction.request>): Generator<Effect, void, unknown> {
   try {
-    // Удаляем из правильного эндпоинта
-    yield call(axios.delete, `${API_URL}/users/me`, { headers: getAuthHeaders() });
+    yield call(usersClient.delete, '/me');
     yield put(deleteProfileAction.success());
     localStorage.clear();
     payload.navigate('/login');
@@ -72,12 +62,11 @@ function* uploadAvatarWorker({
   payload,
 }: ReturnType<typeof uploadAvatarAction.request>): Generator<Effect, void, unknown> {
   try {
-    // Бэкенд ждет multipart/form-data
     const formData = new FormData();
     formData.append('file', payload);
 
-    const response = (yield call(axios.post, `${API_URL}/users/me/image`, formData, {
-      headers: { ...getAuthHeaders(), 'Content-Type': 'multipart/form-data' },
+    const response = (yield call(usersClient.post, '/me/image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
     })) as any;
 
     yield put(uploadAvatarAction.success(response.data.profile_image_url || ''));
