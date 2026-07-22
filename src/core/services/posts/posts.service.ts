@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { postsClient, authClient } from '~/api/client';
+import { postsClient, authClient, usersClient } from '~/api/client';
 
 export const getGlobalPosts = async () => {
   const response = await postsClient.get('/post/');
@@ -46,7 +46,7 @@ export const unfollowPage = async (pageId: string) => {
 };
 
 export const getUserById = async (userId: string) => {
-  const response = await authClient.get(`/users/${userId}`);
+  const response = await authClient.get(`/${userId}`);
   return response.data;
 };
 
