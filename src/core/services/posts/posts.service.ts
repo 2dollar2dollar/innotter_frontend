@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { postsClient, authClient, usersClient } from '~/api/client';
+import { postsClient, usersClient } from '~/api/client';
 
 export const getGlobalPosts = async () => {
   const response = await postsClient.get('/post/');
