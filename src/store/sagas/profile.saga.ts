@@ -45,7 +45,8 @@ export class ProfileSagaWorker {
           )) as any;
 
           if (urlResponse.data?.presigned_url) {
-            profileData.profile_image_url = `${urlResponse.data.presigned_url}&t=${Date.now()}`;
+            // profileData.profile_image_url = `${urlResponse.data.presigned_url}&t=${Date.now()}`;
+            profileData.profile_image_url = `${urlResponse.data.presigned_url}`;
           }
         } catch {
           // Ignore if avatar does not exist in resizer-service yet
