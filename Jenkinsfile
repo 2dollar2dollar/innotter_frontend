@@ -36,6 +36,7 @@ pipeline {
                   --build-arg AUTH_API_URL="/api/v1/auth" \
                   --build-arg POSTS_API_URL="/api/v1/posts" \
                   --build-arg USERS_API_URL="/api/v1/users" \
+                  --build-arg RESIZER_API_URL="/api/v1/resizer" \
                   -t ${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile .
                 '''
             }

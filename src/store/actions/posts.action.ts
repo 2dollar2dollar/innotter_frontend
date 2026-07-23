@@ -9,9 +9,8 @@ export enum PostsTypes {
 export interface PostData {
   id: string;
   page: string;
-  author_id?: string; // <-- НОВОЕ ПОЛЕ с бэкенда
+  author_id?: string;
   author?: {
-    // <-- Сюда сага положит данные юзера из UMS
     username?: string;
     name?: string;
     surname?: string;
