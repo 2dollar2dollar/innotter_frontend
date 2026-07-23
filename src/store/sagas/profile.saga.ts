@@ -2,7 +2,7 @@ import { takeLatest, call, put, Effect } from 'redux-saga/effects';
 import { ActionType } from 'typesafe-actions';
 import axios from 'axios';
 
-import { usersClient } from '~/api/client';
+import { usersClient, resizerClient } from '~/api/client';
 
 import {
   fetchProfileAction,
@@ -57,6 +57,24 @@ function* deleteProfileWorker({
     yield put(deleteProfileAction.failure(extractError(error)));
   }
 }
+//
+// function* uploadAvatarWorker({
+//  payload,
+// }: ReturnType<typeof uploadAvatarAction.request>): Generator<Effect, void, unknown> {
+//  try {
+//    const formData = new FormData();
+//    formData.append('file', payload);
+//
+//    const response = (yield call(usersClient.post, '/me/image', formData, {
+//      headers: { 'Content-Type': 'multipart/form-data' },
+//    })) as any;
+//
+//    yield put(uploadAvatarAction.success(response.data.profile_image_url || ''));
+//    yield put(fetchProfileAction.request());
+//  } catch (error: unknown) {
+//    yield put(uploadAvatarAction.failure(extractError(error)));
+//  }
+// }
 
 function* uploadAvatarWorker({
   payload,
@@ -65,11 +83,21 @@ function* uploadAvatarWorker({
     const formData = new FormData();
     formData.append('file', payload);
 
-    const response = (yield call(usersClient.post, '/me/image', formData, {
+    const resizerResponse = (yield call(resizerClient.post, '/upload', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })) as any;
 
-    yield put(uploadAvatarAction.success(response.data.profile_image_url || ''));
+    const objectKey = resizerResponse.data.object_key;
+
+    const urlResponse = (yield call(
+      resizerClient.get,
+      `/presigned-url?object_key=${objectKey}`
+    )) as any;
+    const finalUrl = urlResponse.data.presigned_url;
+
+    yield call(usersClient.patch, '/me', { profile_image_url: finalUrl });
+
+    yield put(uploadAvatarAction.success(finalUrl));
     yield put(fetchProfileAction.request());
   } catch (error: unknown) {
     yield put(uploadAvatarAction.failure(extractError(error)));
