@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Box, Typography, Button, CircularProgress } from '@mui/material';
+import { Box, Typography, Button, CircularProgress, Dialog, IconButton } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -10,7 +10,7 @@ import { fetchProfileAction } from '~/store/actions/profile.action';
 import {
   fetchSubscriptionsAction,
   toggleFollowAction,
-  fetchAllPagesAction, // <-- ИСПРАВЛЕНИЕ: Добавили недостающий импорт экшена
+  fetchAllPagesAction,
   TagData,
 } from '~/store/actions/posts.action';
 import * as PostsService from '~/core/services/posts/posts.service';
@@ -25,14 +25,13 @@ export const ProfilePage: React.FC = () => {
   const [foreignUser, setForeignUser] = useState<any>(null);
   const [userPages, setUserPages] = useState<any[]>([]);
   const [isLoadingPages, setIsLoadingPages] = useState(true);
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
 
-  // Данные текущего залогиненного пользователя из Redux
   const { data: currentUserData, isLoading: isProfileLoading } = useSelector(
     (state: AppState) => state.profile
   );
   const { subscribedPageIds } = useSelector((state: AppState) => state.posts);
 
-  // Достаем наш ID из токена, чтобы понять, смотрим ли мы свой профиль
   const currentUserId = useMemo(() => {
     const token = localStorage.getItem('accessToken');
     if (!token) return null;
@@ -47,22 +46,18 @@ export const ProfilePage: React.FC = () => {
   const isMyProfile = !userId || userId === currentUserId;
   const targetUserId = userId || currentUserId;
 
-  // 1. Загружаем данные пользователя
   useEffect(() => {
     if (isMyProfile && !currentUserData) {
       dispatch(fetchProfileAction.request());
     } else if (!isMyProfile && userId) {
-      // Если смотрим чужой профиль — тянем данные из UMS
       PostsService.getUserById(userId).then(setForeignUser).catch(console.error);
     }
   }, [dispatch, isMyProfile, currentUserData, userId]);
 
-  // 2. Загружаем подписки (чтобы правильно отображать кнопки Follow/Unfollow)
   useEffect(() => {
     dispatch(fetchSubscriptionsAction.request());
   }, [dispatch]);
 
-  // 3. Загружаем список страниц этого пользователя
   useEffect(() => {
     if (targetUserId) {
       setIsLoadingPages(true);
@@ -80,7 +75,6 @@ export const ProfilePage: React.FC = () => {
     dispatch(toggleFollowAction.request({ pageId, isCurrentlyFollowed }));
   };
 
-  // Определяем, чьи данные выводить на экран
   const displayUser = isMyProfile ? currentUserData : foreignUser;
   const isLoading = isProfileLoading || isLoadingPages || (!displayUser && isMyProfile);
 
@@ -95,11 +89,11 @@ export const ProfilePage: React.FC = () => {
   return (
     <MainLayout>
       <Box sx={{ borderBottom: '1px solid #E5E7EB', pb: 4 }}>
-        {/* Шапка профиля */}
         <Box sx={{ width: '100%', height: '150px', backgroundColor: '#E8EEFA' }} />
 
         <Box sx={{ px: '30px', position: 'relative' }}>
           <Box
+            onClick={() => setIsAvatarModalOpen(true)}
             sx={{
               position: 'absolute',
               top: '-60px',
@@ -107,13 +101,15 @@ export const ProfilePage: React.FC = () => {
               borderRadius: '50%',
               backgroundColor: 'white',
               display: 'flex',
+              cursor: 'pointer',
+              transition: 'opacity 0.2s',
+              '&:hover': { opacity: 0.8 },
             }}
           >
             <Avatar src={String(avatar)} size="large" />
           </Box>
 
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 2, minHeight: '60px' }}>
-            {/* КНОПКА РЕДАКТИРОВАНИЯ (Только если это мой профиль) */}
             {isMyProfile && (
               <Button
                 variant="outlined"
@@ -132,7 +128,6 @@ export const ProfilePage: React.FC = () => {
         </Box>
       </Box>
 
-      {/* СПИСОК СТРАНИЦ ПОЛЬЗОВАТЕЛЯ */}
       <Box sx={{ p: '20px 30px' }}>
         <Typography sx={{ fontSize: '20px', fontWeight: 800, mb: 4 }}>
           {isMyProfile ? 'My Pages' : 'Pages'}
@@ -300,6 +295,54 @@ export const ProfilePage: React.FC = () => {
           </Box>
         )}
       </Box>
+
+      <Dialog
+        open={isAvatarModalOpen}
+        onClose={() => setIsAvatarModalOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        sx={{
+          '& .MuiDialog-paper': {
+            backgroundColor: 'transparent',
+            boxShadow: 'none',
+            overflow: 'hidden',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          },
+        }}
+      >
+        <Box sx={{ position: 'relative' }}>
+          <IconButton
+            onClick={() => setIsAvatarModalOpen(false)}
+            sx={{ position: 'absolute', top: -40, right: -40, color: 'white' }}
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </IconButton>
+
+          <img
+            src={String(avatar)}
+            alt="User Avatar"
+            style={{
+              width: '255px',
+              height: '255px',
+              borderRadius: '50%',
+              objectFit: 'cover',
+              border: '4px solid white',
+            }}
+          />
+        </Box>
+      </Dialog>
     </MainLayout>
   );
 };

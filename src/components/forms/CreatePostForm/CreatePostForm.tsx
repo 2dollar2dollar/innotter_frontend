@@ -39,7 +39,6 @@ export const CreatePostForm: React.FC = () => {
 
   const isPosting = useSelector((state: AppState) => state.posts.isLoading);
 
-  // Достаем ID пользователя из токена, чтобы загрузить его страницы
   const currentUserId = useMemo(() => {
     const token = localStorage.getItem('accessToken');
     if (!token) return null;
@@ -51,7 +50,6 @@ export const CreatePostForm: React.FC = () => {
     }
   }, []);
 
-  // При загрузке подтягиваем список страниц текущего пользователя
   useEffect(() => {
     if (currentUserId) {
       setIsLoadingPages(true);
@@ -60,7 +58,6 @@ export const CreatePostForm: React.FC = () => {
         .then((res: any) => {
           const pages = Array.isArray(res) ? res : res.results || [];
           setMyPages(pages);
-          // По умолчанию выбираем первую страницу, если она есть
           if (pages.length > 0) {
             setSelectedPageId(pages[0].id);
           }
@@ -70,7 +67,6 @@ export const CreatePostForm: React.FC = () => {
     }
   }, [currentUserId]);
 
-  // Кнопка блокируется, если нет текста/файла, если идет отправка, ИЛИ если не выбрана страница
   const isButtonDisabled =
     (text.trim().length === 0 && !selectedFile) || isPosting || !selectedPageId;
 
@@ -90,7 +86,7 @@ export const CreatePostForm: React.FC = () => {
       createPostAction.request({
         content: text,
         imageFile: selectedFile || undefined,
-        pageId: selectedPageId, // Явно указываем, в какую страницу летит пост
+        pageId: selectedPageId,
       })
     );
     setText('');
@@ -146,7 +142,6 @@ export const CreatePostForm: React.FC = () => {
           />
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-            {/* Кнопка выбора страницы */}
             <MuiButton
               variant="text"
               onClick={(e) => setAnchorEl(e.currentTarget)}
@@ -164,7 +159,6 @@ export const CreatePostForm: React.FC = () => {
               {isLoadingPages ? 'Loading...' : selectedPageName}
             </MuiButton>
 
-            {/* Выпадающее меню */}
             <Menu
               anchorEl={anchorEl}
               open={Boolean(anchorEl)}

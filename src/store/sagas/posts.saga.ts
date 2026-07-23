@@ -442,24 +442,20 @@ function* editPageWorker({
     if (payload.description !== undefined) requestData.description = payload.description;
     if (payload.tag_names) requestData.tag_names = payload.tag_names;
 
-    // Передаем расширение файла, если пользователь выбрал новую картинку
     if (payload.file) requestData.image_extension = payload.file.name.split('.').pop();
 
     const response = (yield call(PostsService.updatePage, payload.pageId, requestData)) as any;
     const updatedPage = { ...(response.data || response) };
 
-    // ПРОВЕРКА: Дал ли бэкенд ссылку для загрузки новой картинки?
     if (payload.file) {
       if (updatedPage.upload_url) {
         yield call(axios.put, updatedPage.upload_url, payload.file, {
           headers: { 'Content-Type': payload.file.type },
         });
 
-        // Сбрасываем кеш браузера, чтобы он показал новую картинку
         const newImageUrl = updatedPage.upload_url.split('?')[0];
         updatedPage.image_url = `${newImageUrl}?t=${Date.now()}`;
       } else {
-        // ЕСЛИ ССЫЛКИ НЕТ — ВЫВОДИМ ОШИБКУ
         console.error(
           "❌ ОШИБКА: Файл выбран, но бэкенд НЕ вернул 'upload_url'! Метод partial_update на бэкенде игнорирует картинку."
         );

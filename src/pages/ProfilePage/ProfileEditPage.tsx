@@ -25,24 +25,18 @@ import { Avatar } from '~/components/shared/Avatar';
 import avatarImg from '~/assets/no_avatar.png';
 import { FormField } from '~/components/shared/FormField';
 
-// ИСПРАВЛЕНИЕ: Теперь мы собираем номер строго по маске +375 (XX) XXX-XX-XX
-// чтобы PatternFormat идеально принял его при первой загрузке.
 const getInitialPhone = (phone?: string | null) => {
   if (!phone) return '';
 
-  // 1. Оставляем только цифры
   const digits = phone.replace(/\D/g, '');
 
-  // 2. Отрезаем код страны 375, если он есть
   let main = digits;
   if (digits.startsWith('375')) {
     main = digits.slice(3);
   }
 
-  // Если цифр нет (или был только код), возвращаем пустую строку
   if (!main) return '';
 
-  // 3. Собираем строку строго по формату +375 (##) ###-##-##
   let res = '+375';
   if (main.length > 0) res += ` (${main.slice(0, 2)}`;
   if (main.length > 2) res += `) ${main.slice(2, 5)}`;
@@ -75,7 +69,6 @@ export const ProfileEditPage: React.FC = () => {
     dispatch(fetchProfileAction.request());
   }, [dispatch]);
 
-  // Заполняем форму актуальными данными, только если мы не в режиме редактирования
   useEffect(() => {
     if (data && !isEditing) {
       setFormData({
@@ -87,7 +80,6 @@ export const ProfileEditPage: React.FC = () => {
     }
   }, [data, isEditing]);
 
-  // Закрываем режим редактирования ТОЛЬКО после осознанного нажатия Submit
   useEffect(() => {
     if (isFormSaving && !isUpdating) {
       if (!error) {
@@ -123,7 +115,6 @@ export const ProfileEditPage: React.FC = () => {
     if (formData.name !== (data?.name || '')) payload.name = formData.name;
     if (formData.surname !== (data?.surname || '')) payload.surname = formData.surname;
 
-    // Очищаем введенный телефон от маски (оставляем только цифры) перед отправкой
     const cleanedPhone = formData.phone_number.replace(/\D/g, '');
     const dataPhoneCleaned = (data?.phone_number || '').replace(/\D/g, '');
 
@@ -131,7 +122,7 @@ export const ProfileEditPage: React.FC = () => {
       if (cleanedPhone.length > 3) {
         payload.phone_number = `+${cleanedPhone}`;
       } else {
-        payload.phone_number = ''; // Если пользователь полностью стер номер телефона
+        payload.phone_number = '';
       }
     }
 
@@ -141,7 +132,6 @@ export const ProfileEditPage: React.FC = () => {
     }
 
     setIsFormSaving(true);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     dispatch(updateProfileAction.request(payload as any));
   };
 
