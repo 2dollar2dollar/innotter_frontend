@@ -1,8 +1,8 @@
 import axios, { AxiosInstance } from 'axios';
 
-const AUTH_API_URL = process.env.AUTH_API_URL || '/api/v1/auth';
-const POSTS_API_URL = process.env.POSTS_API_URL || '/api/v1/posts';
-const USERS_API_URL = process.env.USERS_API_URL || '/api/v1/users';
+const AUTH_API_URL = process.env.REACT_APP_AUTH_API_URL || '/api/v1/auth';
+const POSTS_API_URL = process.env.REACT_APP_POSTS_API_URL || '/api/v1/posts';
+const USERS_API_URL = process.env.REACT_APP_USERS_API_URL || '/api/v1/users';
 
 const attachInterceptors = (client: AxiosInstance) => {
   client.interceptors.request.use(

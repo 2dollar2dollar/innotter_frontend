@@ -25,8 +25,11 @@ export const createPost = async (
 };
 
 export const uploadImageToS3 = async (url: string, file: File) => {
+  const contentType = file.type === 'image/jpg' ? 'image/jpeg' : file.type || 'image/jpeg';
   return axios.put(url, file, {
-    headers: { 'Content-Type': file.type },
+    headers: {
+      'Content-Type': contentType,
+    },
   });
 };
 

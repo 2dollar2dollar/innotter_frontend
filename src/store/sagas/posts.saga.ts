@@ -331,9 +331,7 @@ function* createCommentWorker({
     const newComment = responseComment.data || responseComment;
 
     if (newComment.upload_url && payload.file) {
-      yield call(axios.put, newComment.upload_url, payload.file, {
-        headers: { 'Content-Type': payload.file.type },
-      });
+      yield call(PostsService.uploadImageToS3, newComment.upload_url, payload.file);
     }
 
     if (newComment.author_id) {
