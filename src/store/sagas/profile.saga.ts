@@ -2,7 +2,7 @@ import { takeLatest, call, put, Effect } from 'redux-saga/effects';
 import { ActionType } from 'typesafe-actions';
 import axios from 'axios';
 
-import { usersClient, resizerClient } from '~/api/client';
+import { usersClient } from '~/api/client';
 
 import {
   fetchProfileAction,
@@ -24,36 +24,10 @@ const extractError = (error: unknown): string => {
 };
 
 export class ProfileSagaWorker {
-  // static *fetchProfile(): Generator<Effect, void, any> {
-  //   try {
-  //     const response = yield call(usersClient.get, '/me');
-  //     yield put(fetchProfileAction.success(response.data as AuthSuccessPayload));
-  //   } catch (error: unknown) {
-  //     yield put(fetchProfileAction.failure(extractError(error)));
-  //   }
-  // }
   static *fetchProfile(): Generator<Effect, void, any> {
     try {
       const response = yield call(usersClient.get, '/me');
-      const profileData = response.data as AuthSuccessPayload;
-
-      if (profileData && profileData.id) {
-        try {
-          const urlResponse = (yield call(
-            resizerClient.get,
-            `/presigned-url?object_key=cropped/${profileData.id}.jpg`
-          )) as any;
-
-          if (urlResponse.data?.presigned_url) {
-            // profileData.profile_image_url = `${urlResponse.data.presigned_url}&t=${Date.now()}`;
-            profileData.profile_image_url = `${urlResponse.data.presigned_url}`;
-          }
-        } catch {
-          // Ignore if avatar does not exist in resizer-service yet
-        }
-      }
-
-      yield put(fetchProfileAction.success(profileData));
+      yield put(fetchProfileAction.success(response.data as AuthSuccessPayload));
     } catch (error: unknown) {
       yield put(fetchProfileAction.failure(extractError(error)));
     }
@@ -83,51 +57,20 @@ function* deleteProfileWorker({
     yield put(deleteProfileAction.failure(extractError(error)));
   }
 }
-//
-// function* uploadAvatarWorker({
-//  payload,
-// }: ReturnType<typeof uploadAvatarAction.request>): Generator<Effect, void, unknown> {
-//  try {
-//    const formData = new FormData();
-//    formData.append('file', payload);
-//
-//    const response = (yield call(usersClient.post, '/me/image', formData, {
-//      headers: { 'Content-Type': 'multipart/form-data' },
-//    })) as any;
-//
-//    yield put(uploadAvatarAction.success(response.data.profile_image_url || ''));
-//    yield put(fetchProfileAction.request());
-//  } catch (error: unknown) {
-//    yield put(uploadAvatarAction.failure(extractError(error)));
-//  }
-// }
 
 function* uploadAvatarWorker({
   payload,
 }: ReturnType<typeof uploadAvatarAction.request>): Generator<Effect, void, unknown> {
   try {
-    const token = localStorage.getItem('accessToken');
-    if (!token) throw new Error('No access token');
-    const tokenPayload = JSON.parse(atob(token.split('.')[1]));
-    const userId = tokenPayload.id || tokenPayload.user_id || tokenPayload.sub;
-
     const formData = new FormData();
     formData.append('file', payload);
 
-    const resizerResponse = (yield call(resizerClient.post, `/upload?user_id=${userId}`, formData, {
+    const response = (yield call(usersClient.post, '/me/image', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })) as any;
 
-    const objectKey = resizerResponse.data.object_key;
-
-    const urlResponse = (yield call(
-      resizerClient.get,
-      `/presigned-url?object_key=${objectKey}`
-    )) as any;
-
-    const finalUrl = urlResponse.data.presigned_url;
-
-    yield put(uploadAvatarAction.success(finalUrl));
+    yield put(uploadAvatarAction.success(response.data.profile_image_url || ''));
+    yield put(fetchProfileAction.request());
   } catch (error: unknown) {
     yield put(uploadAvatarAction.failure(extractError(error)));
   }
