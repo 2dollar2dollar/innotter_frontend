@@ -33,7 +33,7 @@ export const uploadAvatarAction = createAsyncAction(
   '[Profile] Upload Avatar Request',
   '[Profile] Upload Avatar Success',
   '[Profile] Upload Avatar Failed'
-)<File, string, string>(); // Передаем файл, получаем новый URL картинки
+)<File, string, string>();
 
 export type ProfileActionUnion =
   | ActionType<typeof fetchProfileAction>

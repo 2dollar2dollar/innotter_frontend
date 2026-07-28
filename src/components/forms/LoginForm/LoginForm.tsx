@@ -93,7 +93,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, isLoading, serve
             sx={{ mt: -1 }}
           />
 
-          {/* Ошибка сервера над кнопкой */}
           {serverError && (
             <Typography color="error" variant="body2" sx={{ textAlign: 'center', mt: -1 }}>
               {serverError}

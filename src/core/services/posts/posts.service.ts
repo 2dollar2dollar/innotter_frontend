@@ -18,7 +18,7 @@ export const getUserPages = async (userId: string) => {
 
 export const createPost = async (
   pageId: string,
-  payload: { content: string; image_extension?: string; reply_to?: string | null } // <-- Добавили reply_to
+  payload: { content: string; image_extension?: string; reply_to?: string | null }
 ) => {
   const response = await postsClient.post(`/page/${pageId}/post/`, payload);
   return response.data;

@@ -51,7 +51,6 @@ export const profileReducer = createReducer<ProfileState, ProfileActionUnion>(in
     error: action.payload,
   }))
   .handleAction(uploadAvatarAction.success, (state, action) => ({
-    // 👈 2. Добавь обработку загрузки аватарки!
     ...state,
     data: state.data ? { ...state.data, profile_image_url: action.payload } : null,
   }));

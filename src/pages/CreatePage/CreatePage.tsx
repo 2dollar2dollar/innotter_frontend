@@ -29,7 +29,6 @@ export const CreatePage: React.FC = () => {
 
   const { tags, isLoading, error } = useSelector((state: AppState) => state.posts);
 
-  // Загружаем существующие теги при открытии страницы
   useEffect(() => {
     dispatch(fetchTagsAction.request());
   }, [dispatch]);
@@ -37,7 +36,6 @@ export const CreatePage: React.FC = () => {
   const handleTagChange = (event: SelectChangeEvent<typeof selectedTags>) => {
     const value = event.target.value;
     const newTags = typeof value === 'string' ? value.split(',') : value;
-    // Ограничиваем до 5 тегов
     if (newTags.length <= 5) {
       setSelectedTags(newTags);
     }
@@ -61,7 +59,7 @@ export const CreatePage: React.FC = () => {
         description,
         tag_names: selectedTags,
         file: selectedFile || undefined,
-        navigate, // Передаем навигатор в сагу, чтобы она перекинула нас после успеха
+        navigate,
       })
     );
   };
@@ -73,7 +71,6 @@ export const CreatePage: React.FC = () => {
       </Box>
 
       <Box component="form" onSubmit={handleSubmit} sx={{ pb: 5 }}>
-        {/* ЗОНА ЗАГРУЗКИ ФОНОВОГО БАННЕРА */}
         <Box
           sx={{
             width: '100%',

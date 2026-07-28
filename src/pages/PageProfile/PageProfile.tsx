@@ -78,7 +78,7 @@ export const PageProfile: React.FC = () => {
       const rawRole = payload.role || payload.role_name || 'USER';
       return {
         id: payload.id || payload.user_id || payload.sub,
-        role: String(rawRole).toUpperCase(), // ФОРСИРУЕМ ВЕРХНИЙ РЕГИСТР
+        role: String(rawRole).toUpperCase(),
         group: payload.group_name || payload.group || '',
       };
     } catch {
@@ -474,7 +474,6 @@ export const PageProfile: React.FC = () => {
         )}
       </Box>
 
-      {/* МОДАЛКИ */}
       <Dialog
         open={isEditPageOpen}
         onClose={() => setIsEditPageOpen(false)}

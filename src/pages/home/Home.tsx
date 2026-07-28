@@ -151,7 +151,6 @@ export const Home: React.FC = () => {
         </Tabs>
       </Box>
 
-      {/* ИСПРАВЛЕНИЕ: Форма создания поста рендерится только на вкладке Global */}
       {tabValue === 'global' && (
         <>
           <Box sx={{ pt: '20px', pb: '10px', px: '30px' }}>
@@ -241,7 +240,6 @@ export const Home: React.FC = () => {
         )}
       </Box>
 
-      {/* МОДАЛКИ */}
       <Dialog open={!!postToEdit} onClose={() => setPostToEdit(null)} fullWidth maxWidth="sm">
         <DialogTitle sx={{ fontWeight: 700 }}>Edit Post</DialogTitle>
         <DialogContent sx={{ pt: 1 }}>

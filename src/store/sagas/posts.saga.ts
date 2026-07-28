@@ -455,7 +455,7 @@ function* editPageWorker({
         updatedPage.image_url = `${newImageUrl}?t=${Date.now()}`;
       } else {
         console.error(
-          "❌ ОШИБКА: Файл выбран, но бэкенд НЕ вернул 'upload_url'! Метод partial_update на бэкенде игнорирует картинку."
+          "❌ ERROR: The file was selected, but the backend did NOT return the 'upload_url'! The partial_update method on the backend ignores the image."
         );
       }
     }
@@ -499,7 +499,9 @@ function* editPostWorker({
         const newImageUrl = updatedPost.upload_url.split('?')[0];
         updatedPost.image_url = `${newImageUrl}?t=${Date.now()}`;
       } else {
-        console.error("❌ ОШИБКА: Файл выбран, но бэкенд НЕ вернул 'upload_url' для поста!");
+        console.error(
+          "❌ ERROR: The file was selected, but the backend did NOT return 'upload_url' for the post!"
+        );
       }
     }
 

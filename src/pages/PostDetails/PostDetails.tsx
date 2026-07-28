@@ -63,7 +63,7 @@ export const PostDetails: React.FC = () => {
       createCommentAction.request({
         content: commentText || '\u200B',
         replyTo: currentPost.id,
-        pageId: currentPost.page, // Передаем ID страницы поста!
+        pageId: currentPost.page,
         file: selectedFile || undefined,
       })
     );
@@ -90,7 +90,6 @@ export const PostDetails: React.FC = () => {
     );
   }
 
-  // Для главного поста берем автора из author (если есть) ИЛИ из страницы
   const mainUser = currentPost.author || currentPost.page_details?.user;
   const mainAuthorName = mainUser?.name
     ? `${mainUser.name} ${mainUser.surname || ''}`.trim()
@@ -274,7 +273,6 @@ export const PostDetails: React.FC = () => {
 
         <Box sx={{ display: 'flex', flexDirection: 'column', zIndex: 1, position: 'relative' }}>
           {replies.map((reply: PostData) => {
-            // ИСПОЛЬЗУЕМ ДАННЫЕ ИЗ НОВОГО ПОЛЯ AUTHOR, А НЕ ИЗ СТРАНИЦЫ
             const replyUser = reply.author || reply.page_details?.user;
             const replyAuthorName = replyUser?.name
               ? `${replyUser.name} ${replyUser.surname || ''}`.trim()

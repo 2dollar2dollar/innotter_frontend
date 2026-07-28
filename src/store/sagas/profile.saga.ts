@@ -62,30 +62,24 @@ function* uploadAvatarWorker({
   payload,
 }: ReturnType<typeof uploadAvatarAction.request>): Generator<Effect, void, unknown> {
   try {
-    // 1. Извлекаем расширение файла (например, "png" или "jpg")
     const ext = payload.name.split('.').pop() || 'jpg';
 
-    // 2. ШАГ 1: Получаем Presigned URL от нашего бэкенда
     const urlResponse = (yield call(usersClient.post, '/me/avatar/upload-url', {
       file_extension: ext,
     })) as any;
 
     const uploadUrl = urlResponse.data.upload_url;
 
-    // 3. ШАГ 2: Грузим файл напрямую в S3
-    // Используем чистый axios (без interceptors), чтобы не прикреплять JWT токен!
     yield call(axios.put, uploadUrl, payload, {
       headers: {
-        'Content-Type': payload.type, // Обязательно указываем Content-Type (image/jpeg, image/png)
+        'Content-Type': payload.type,
       },
     });
 
-    // 4. ШАГ 3: Сообщаем бэкенду, что загрузка в S3 завершена
     const completeResponse = (yield call(usersClient.post, '/me/avatar/upload-complete', {
       file_extension: ext,
     })) as any;
 
-    // 5. Обновляем аватарку в Redux (бэкенд возвращает обновленного юзера)
     yield put(uploadAvatarAction.success(completeResponse.data.profile_image_url || ''));
     yield put(fetchProfileAction.request());
   } catch (error: unknown) {

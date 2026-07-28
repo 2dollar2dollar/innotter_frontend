@@ -30,7 +30,6 @@ export const CreatePostForm: React.FC = () => {
   const [text, setText] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  // --- Стейты для логики выбора страницы ---
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [myPages, setMyPages] = useState<any[]>([]);
   const [selectedPageId, setSelectedPageId] = useState<string | null>(null);

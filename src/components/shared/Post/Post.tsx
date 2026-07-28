@@ -65,14 +65,12 @@ export const Post: React.FC<PostProps> = ({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const openMenu = Boolean(anchorEl);
 
-  // Клик по всей области поста -> переходим в детали поста
   const handlePostClick = () => {
     navigate(`/post/${id}`);
   };
 
-  // Клик по профилю (Аватар, Имя, Юзернейм) -> переходим в профиль пользователя
   const handleProfileClick = (event: React.MouseEvent) => {
-    event.stopPropagation(); // Останавливаем клик, чтобы не сработал handlePostClick
+    event.stopPropagation();
     if (authorId) {
       navigate(`/profile/${authorId}`);
     } else {
@@ -128,7 +126,6 @@ export const Post: React.FC<PostProps> = ({
 
       <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: '8px' }}>
-          {/* Кликабельная зона автора */}
           <Box
             onClick={handleProfileClick}
             sx={{
@@ -154,7 +151,6 @@ export const Post: React.FC<PostProps> = ({
           <Typography sx={{ color: '#828282', mr: '8px' }}>•</Typography>
           <Typography sx={{ color: '#828282' }}>{timeAgo}</Typography>
 
-          {/* ИСПРАВЛЕНИЕ: Убрали условие hasMenuActions, теперь меню доступно ВСЕМ для перехода на страницу */}
           <Box sx={{ marginLeft: 'auto', position: 'relative' }}>
             <Box onClick={handleMenuClick} sx={{ display: 'inline-block', cursor: 'pointer' }}>
               <ClickableIcon src={chevronIcon} size="small" />
@@ -176,7 +172,6 @@ export const Post: React.FC<PostProps> = ({
                 },
               }}
             >
-              {/* ИСПРАВЛЕНИЕ: Кнопка Visit Page теперь идет самой первой и доступна абсолютно всем */}
               <MenuItem
                 onClick={(e) => {
                   handleMenuClose(e);
@@ -280,7 +275,6 @@ export const Post: React.FC<PostProps> = ({
         )}
 
         <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, gap: 6 }}>
-          {/* Зона лайка */}
           <Box
             sx={{
               display: 'flex',
@@ -311,7 +305,6 @@ export const Post: React.FC<PostProps> = ({
             <Typography sx={{ fontSize: '15px' }}>{likesCount}</Typography>
           </Box>
 
-          {/* Зона комментов */}
           <Box
             sx={{
               display: 'flex',

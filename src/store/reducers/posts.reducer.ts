@@ -22,7 +22,6 @@ import {
   createTagAction,
 } from '../actions/posts.action';
 
-// Расширяем PageItemData для хранения полной информации о профиле страницы
 export interface CurrentPageDetails extends PageItemData {
   tags?: TagData[];
   user?: Record<string, unknown>;

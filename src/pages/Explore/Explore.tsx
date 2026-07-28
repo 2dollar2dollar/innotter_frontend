@@ -32,7 +32,7 @@ export const Explore: React.FC = () => {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const rawRole = payload.role || payload.role_name || 'USER';
-      return String(rawRole).toUpperCase(); // ФОРСИРУЕМ ВЕРХНИЙ РЕГИСТР
+      return String(rawRole).toUpperCase();
     } catch {
       return 'USER';
     }
@@ -70,7 +70,6 @@ export const Explore: React.FC = () => {
         <Typography sx={{ fontSize: '24px', fontWeight: 700 }}>Explore</Typography>
       </Box>
 
-      {/* ТРЕНДОВЫЕ ТЕГИ */}
       <Box sx={{ p: '20px 30px', borderBottom: '1px solid #E5E7EB' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography sx={{ fontSize: '20px', fontWeight: 800 }}>Trending Tags</Typography>
@@ -118,7 +117,6 @@ export const Explore: React.FC = () => {
         )}
       </Box>
 
-      {/* КАТАЛОГ СТРАНИЦ */}
       <Box sx={{ p: '20px 30px' }}>
         <Typography sx={{ fontSize: '20px', fontWeight: 800, mb: 4 }}>
           {selectedTag ? `Pages with #${selectedTag}` : 'Who to follow'}

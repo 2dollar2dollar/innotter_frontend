@@ -119,11 +119,7 @@ export const createCommentAction = createAsyncAction(
   '[Posts] Create Comment Request',
   '[Posts] Create Comment Success',
   '[Posts] Create Comment Failed'
-)<
-  { content: string; replyTo: string; pageId: string; file?: File }, // Вернули pageId
-  PostData,
-  string
->();
+)<{ content: string; replyTo: string; pageId: string; file?: File }, PostData, string>();
 
 export const fetchTagsAction = createAsyncAction(
   '[Explore] Fetch Tags Request',
